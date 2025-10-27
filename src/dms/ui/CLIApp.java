@@ -5,6 +5,8 @@ import dms.service.DVDCollection;
 import dms.util.Validator;
 import java.util.List;
 import java.util.Scanner;
+import dms.util.CSVImporter;
+
 
 /**
  * Irene Duett, CEN 3024c, 10/9/2025
@@ -41,7 +43,8 @@ public class CLIApp {
             System.out.println("3. Update DVD");
             System.out.println("4. Remove DVD");
             System.out.println("5. Compute Average Rating by Genre");
-            System.out.println("6. Exit");
+            System.out.println("6. Import DVDs from CSV File");
+            System.out.println("7. Exit");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine();
@@ -51,7 +54,13 @@ public class CLIApp {
                 case "3": updateDVD(); break;
                 case "4": removeDVD(); break;
                 case "5": computeAverage(); break;
-                case "6": System.out.println("Exiting..."); return;
+                case "6":
+                    System.out.print("Enter full CSV file path (example: C:\\Users\\YourName\\movies.csv): ");
+                    String filePath = scanner.nextLine();
+                    int importedCount = CSVImporter.importFromCSV(filePath, dvdCollection);
+                    System.out.println(importedCount + " DVDs were successfully imported.");
+                    break;
+                case "7": System.out.println("Exiting..."); return;
                 default: System.out.println("Invalid choice. Please try again.");
             }
         }

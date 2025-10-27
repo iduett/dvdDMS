@@ -69,4 +69,24 @@ public class DVDCollection {
                 .average()
                 .orElse(0.0);
     }
+
+    /**
+     * method: updateDVD
+     * parameters: int id, DVD updatedDVD
+     * return: boolean
+     * purpose: Updates the fields of an existing DVD by ID. Returns true if updated successfully
+     */
+    public boolean updateDVD(int id, DVD updatedDVD) {
+        Optional<DVD> existing = findById(id);
+        if (existing.isPresent()) {
+            DVD dvd = existing.get();
+            dvd.setTitle(updatedDVD.getTitle());
+            dvd.setDirector(updatedDVD.getDirector());
+            dvd.setReleaseYear(updatedDVD.getReleaseYear());
+            dvd.setGenre(updatedDVD.getGenre());
+            dvd.setRating(updatedDVD.getRating());
+            return true;
+        }
+        return false;
+    }
 }
