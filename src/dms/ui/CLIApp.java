@@ -2,39 +2,29 @@ package dms.ui;
 
 import dms.model.DVD;
 import dms.service.DVDCollection;
-import dms.util.Validator;
-import java.util.List;
-import java.util.Scanner;
 import dms.util.CSVImporter;
+import dms.util.Validator;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * Irene Duett, CEN 3024c, 10/9/2025
  * class: CLIApp
- * purpose: Provides a simple command-line interface for interacting with the DVD Collection.
+ * purpose: Provides a command-line interface for interacting with the DVD database.
  */
 public class CLIApp {
 
-    private final DVDCollection dvdCollection = new DVDCollection();
+    // Provide the path to your SQLite database here
+    private final DVDCollection dvdCollection = new DVDCollection("jdbc:sqlite:C:/Users/irene/IdeaProjects/dvddms/db/dvds.db");
     private final Scanner scanner = new Scanner(System.in);
 
-    /**
-     * method: main
-     * parameters: String[] args
-     * return: void
-     * purpose: Entry point of the DVD Management System CLI
-     */
     public static void main(String[] args) {
         CLIApp app = new CLIApp();
         app.run();
     }
 
-    /**
-     * method: run
-     * parameters: none
-     * return: void
-     * purpose: Displays the main menu and handles user input in a loop
-     */
     private void run() {
         while (true) {
             System.out.println("\n--- DVD Management System ---");
@@ -54,12 +44,7 @@ public class CLIApp {
                 case "3": updateDVD(); break;
                 case "4": removeDVD(); break;
                 case "5": computeAverage(); break;
-                case "6":
-                    System.out.print("Enter full CSV file path (example: C:\\Users\\YourName\\movies.csv): ");
-                    String filePath = scanner.nextLine();
-                    int importedCount = CSVImporter.importFromCSV(filePath, dvdCollection);
-                    System.out.println(importedCount + " DVDs were successfully imported.");
-                    break;
+                case "6": importCSV(); break;
                 case "7": System.out.println("Exiting..."); return;
                 default: System.out.println("Invalid choice. Please try again.");
             }
@@ -83,9 +68,9 @@ public class CLIApp {
 
             DVD dvd = new DVD(0, title, director, year, genre, rating);
             dvdCollection.addDVD(dvd);
-            System.out.println("DVD added successfully.");
+            System.out.println("DVD added successfully!");
         } catch (NumberFormatException e) {
-            System.out.println("Error: " + e.getMessage() + " Please enter valid input.");
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -99,37 +84,38 @@ public class CLIApp {
         try {
             System.out.print("Enter DVD ID to update: ");
             int id = Integer.parseInt(scanner.nextLine());
-            DVD dvd = dvdCollection.findById(id).orElse(null);
-            if (dvd == null) {
+
+            Optional<DVD> dvdOpt = dvdCollection.findById(id);
+            if (dvdOpt.isEmpty()) {
                 System.out.println("DVD not found.");
                 return;
             }
+
+            DVD dvd = dvdOpt.get();
             System.out.print("New Title (" + dvd.getTitle() + "): ");
             String title = scanner.nextLine();
             if (!title.isEmpty()) dvd.setTitle(title);
+
             System.out.print("New Director (" + dvd.getDirector() + "): ");
             String director = scanner.nextLine();
             if (!director.isEmpty()) dvd.setDirector(director);
+
             System.out.print("New Release Year (" + dvd.getReleaseYear() + "): ");
             String yearStr = scanner.nextLine();
-            if (!yearStr.isEmpty()) {
-                int year = Integer.parseInt(yearStr);
-                if (!Validator.isValidYear(year)) throw new NumberFormatException("Invalid year.");
-                dvd.setReleaseYear(year);
-            }
+            if (!yearStr.isEmpty()) dvd.setReleaseYear(Integer.parseInt(yearStr));
+
             System.out.print("New Genre (" + dvd.getGenre() + "): ");
             String genre = scanner.nextLine();
             if (!genre.isEmpty()) dvd.setGenre(genre);
+
             System.out.print("New Rating (" + dvd.getRating() + "): ");
             String ratingStr = scanner.nextLine();
-            if (!ratingStr.isEmpty()) {
-                double rating = Double.parseDouble(ratingStr);
-                if (!Validator.isValidRating(rating)) throw new NumberFormatException("Invalid rating.");
-                dvd.setRating(rating);
-            }
-            System.out.println("DVD updated successfully.");
+            if (!ratingStr.isEmpty()) dvd.setRating(Double.parseDouble(ratingStr));
+
+            boolean success = dvdCollection.updateDVD(id, dvd);
+            System.out.println(success ? "DVD updated successfully!" : "Update failed.");
         } catch (NumberFormatException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error: Invalid input.");
         }
     }
 
@@ -138,9 +124,9 @@ public class CLIApp {
             System.out.print("Enter DVD ID to remove: ");
             int id = Integer.parseInt(scanner.nextLine());
             boolean removed = dvdCollection.removeDVDById(id);
-            System.out.println(removed ? "DVD removed successfully." : "DVD not found.");
+            System.out.println(removed ? "DVD removed successfully!" : "DVD not found.");
         } catch (NumberFormatException e) {
-            System.out.println("Error: Please enter a valid ID.");
+            System.out.println("Error: Invalid input.");
         }
     }
 
@@ -149,5 +135,16 @@ public class CLIApp {
         String genre = scanner.nextLine();
         double avg = dvdCollection.computeAverageRatingByGenre(genre);
         System.out.println("Average rating for genre '" + genre + "': " + avg);
+    }
+
+    private void importCSV() {
+        try {
+            System.out.print("Enter full CSV file path (example: C:\\Users\\YourName\\movies.csv): ");
+            String filePath = scanner.nextLine();
+            int count = CSVImporter.importFromCSV(filePath, dvdCollection);
+            System.out.println(count + " DVDs imported successfully!");
+        } catch (Exception e) {
+            System.out.println("CSV import failed: " + e.getMessage());
+        }
     }
 }

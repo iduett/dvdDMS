@@ -11,22 +11,35 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
- * Irene Duett, CEN 3024c, 10/26/2025
+ * Irene Duett, CEN 3024c, 11/5/2025
  * class: DVDGUIApp
  * purpose: GUI for interacting with the DVD Collection
  */
 public class DVDGUIApp {
 
-    private final DVDCollection collection = new DVDCollection();
+    private final DVDCollection collection;
     private final JFrame frame = new JFrame("DVD Management System");
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new DVDGUIApp().createAndShowGUI());
+        // Ask user for database path before launching GUI
+        String dbPath = JOptionPane.showInputDialog("Enter path to your SQLite database:");
+        if (dbPath == null || dbPath.isBlank()) {
+            JOptionPane.showMessageDialog(null, "No database path provided. Exiting.");
+            return;
+        }
+        SwingUtilities.invokeLater(() -> new DVDGUIApp(dbPath).createAndShowGUI());
+    }
+
+    /**
+     * Constructor initializes DVDCollection with user-provided database path
+     */
+    public DVDGUIApp(String dbPath) {
+        collection = new DVDCollection(dbPath);
     }
 
     private void createAndShowGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 450); // slightly taller for CSV button
+        frame.setSize(500, 450);
         frame.setLayout(new GridLayout(8, 1, 5, 5));
 
         JButton addBtn = new JButton("Add DVD");
