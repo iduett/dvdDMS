@@ -11,17 +11,23 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
- * Irene Duett, CEN 3024c, 11/5/2025
+ * Irene Duett, CEN 3024c, 11/12/2025
  * class: DVDGUIApp
- * purpose: GUI for interacting with the DVD Collection
+ * purpose: GUI for interacting with the DVD Collection.
+ *          Allows users to add, list, update, remove, and import DVD records.
  */
 public class DVDGUIApp {
 
     private final DVDCollection collection;
     private final JFrame frame = new JFrame("DVD Management System");
 
+    /**
+     * method: main
+     * parameters: String[] args
+     * return: void
+     * purpose: Entry point of the GUI application. Prompts the user for a database path and launches the GUI.
+     */
     public static void main(String[] args) {
-        // Ask user for database path before launching GUI
         String dbPath = JOptionPane.showInputDialog("Enter path to your SQLite database:");
         if (dbPath == null || dbPath.isBlank()) {
             JOptionPane.showMessageDialog(null, "No database path provided. Exiting.");
@@ -31,12 +37,20 @@ public class DVDGUIApp {
     }
 
     /**
-     * Constructor initializes DVDCollection with user-provided database path
+     * Constructor initializes DVDCollection with the user-provided database path.
+     *
+     * @param dbPath path to the SQLite database file
      */
     public DVDGUIApp(String dbPath) {
         collection = new DVDCollection(dbPath);
     }
 
+    /**
+     * method: createAndShowGUI
+     * parameters: none
+     * return: void
+     * purpose: Builds the GUI layout, buttons, and their action listeners.
+     */
     private void createAndShowGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 450);
@@ -71,6 +85,12 @@ public class DVDGUIApp {
         frame.setVisible(true);
     }
 
+    /**
+     * method: addDVD
+     * parameters: ActionEvent e
+     * return: void
+     * purpose: Prompts the user to enter DVD details and adds it to the collection.
+     */
     private void addDVD(ActionEvent e) {
         try {
             String title = JOptionPane.showInputDialog(frame, "Enter Title:");
@@ -89,6 +109,12 @@ public class DVDGUIApp {
         }
     }
 
+    /**
+     * method: listDVDs
+     * parameters: ActionEvent e
+     * return: void
+     * purpose: Displays all DVDs currently in the collection in a scrollable dialog.
+     */
     private void listDVDs(ActionEvent e) {
         List<DVD> dvds = collection.listAll();
         if (dvds.isEmpty()) {
@@ -104,6 +130,12 @@ public class DVDGUIApp {
         }
     }
 
+    /**
+     * method: updateDVD
+     * parameters: ActionEvent e
+     * return: void
+     * purpose: Updates an existing DVD by prompting the user for new details.
+     */
     private void updateDVD(ActionEvent e) {
         try {
             int id = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter DVD ID to update:"));
@@ -142,6 +174,12 @@ public class DVDGUIApp {
         }
     }
 
+    /**
+     * method: removeDVD
+     * parameters: ActionEvent e
+     * return: void
+     * purpose: Removes a DVD from the collection using the DVD ID provided by the user.
+     */
     private void removeDVD(ActionEvent e) {
         try {
             int id = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter DVD ID to remove:"));
@@ -152,6 +190,12 @@ public class DVDGUIApp {
         }
     }
 
+    /**
+     * method: computeAverage
+     * parameters: ActionEvent e
+     * return: void
+     * purpose: Computes the average rating for a user-specified genre.
+     */
     private void computeAverage(ActionEvent e) {
         String genre = JOptionPane.showInputDialog(frame, "Enter genre to compute average rating:");
         double avg = collection.computeAverageRatingByGenre(genre);
@@ -160,9 +204,9 @@ public class DVDGUIApp {
 
     /**
      * method: importCSV
-     * parameters: ActionEvent
+     * parameters: ActionEvent e
      * return: void
-     * purpose: Allows the user to select a CSV file and import all DVD records
+     * purpose: Allows the user to select a CSV file and import DVD records into the database.
      */
     private void importCSV(ActionEvent e) {
         JFileChooser fileChooser = new JFileChooser();

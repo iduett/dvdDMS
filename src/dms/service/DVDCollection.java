@@ -8,18 +8,32 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * class: Irene Duett, CEN 3024c, 10/9/2025
- * DVDCollection
- * purpose: Stores and manages DVDs using a SQLite database, providing CRUD operations and calculations.
+ * Irene Duett, CEN 3024c, 11/12/2025
+ *
+ * The {@code DVDCollection} class provides full CRUD (Create, Read, Update, Delete)
+ * functionality for managing {@link DVD} records stored in a SQLite database.
+ *
+ * <p>This class acts as the service layer between the user interface (CLI or GUI)
+ * and the database, handling all SQL operations. It also provides a method to compute
+ * the average rating for DVDs filtered by genre.</p>
+ *
+ * <p><b>Usage Example:</b></p>
+ * <pre>
+ *     DVDCollection collection = new DVDCollection("C:/path/to/dvds.db");
+ *     collection.addDVD(new DVD(0, "Inception", "Christopher Nolan", 2010, "Sci-Fi", 9.0));
+ *     List&lt;DVD&gt; allDvds = collection.listAll();
+ * </pre>
  */
 public class DVDCollection {
 
     private final String dbUrl;
 
     /**
-     * constructor: DVDCollection
-     * parameters: String dbUrl
-     * purpose: Initializes the collection with a SQLite database connection URL
+     * Constructs a new {@code DVDCollection} object linked to the specified SQLite database.
+     * Automatically ensures that the {@code dvd} table exists by invoking
+     * {@link #createTableIfNotExists()}.
+     *
+     * @param dbUrl the full database connection URL (e.g., "jdbc:sqlite:C:/path/to/dvds.db")
      */
     public DVDCollection(String dbUrl) {
         this.dbUrl = dbUrl;
@@ -27,10 +41,10 @@ public class DVDCollection {
     }
 
     /**
-     * method: createTableIfNotExists
-     * parameters: none
-     * return: void
-     * purpose: Ensures the dvd table exists in the database
+     * Ensures that the {@code dvd} table exists in the connected SQLite database.
+     * If the table does not exist, it is created automatically.
+     *
+     * @throws SQLException if there is an error executing the SQL statement
      */
     private void createTableIfNotExists() {
         String sql = "CREATE TABLE IF NOT EXISTS dvd (" +
@@ -50,10 +64,10 @@ public class DVDCollection {
     }
 
     /**
-     * method: addDVD
-     * parameters: DVD dvd
-     * return: void
-     * purpose: Adds a DVD to the database
+     * Adds a new {@link DVD} record to the database.
+     *
+     * @param dvd the {@link DVD} object to add
+     * @throws SQLException if a database access error occurs during insertion
      */
     public void addDVD(DVD dvd) {
         String sql = "INSERT INTO dvd (title, director, release_year, genre, rating) VALUES (?, ?, ?, ?, ?)";
@@ -71,10 +85,10 @@ public class DVDCollection {
     }
 
     /**
-     * method: listAll
-     * parameters: none
-     * return: List<DVD>
-     * purpose: Returns a list of all DVDs from the database
+     * Retrieves all {@link DVD} records from the database.
+     *
+     * @return a list containing all DVDs currently stored in the database
+     * @throws SQLException if a database access error occurs while retrieving data
      */
     public List<DVD> listAll() {
         List<DVD> dvds = new ArrayList<>();
@@ -100,10 +114,11 @@ public class DVDCollection {
     }
 
     /**
-     * method: findById
-     * parameters: int id
-     * return: Optional<DVD>
-     * purpose: Finds a DVD by its unique ID from the database
+     * Finds a {@link DVD} in the database by its unique ID.
+     *
+     * @param id the unique identifier of the DVD to search for
+     * @return an {@link Optional} containing the found {@link DVD}, or empty if not found
+     * @throws SQLException if a database access error occurs while retrieving data
      */
     public Optional<DVD> findById(int id) {
         String sql = "SELECT * FROM dvd WHERE id = ?";
@@ -129,10 +144,11 @@ public class DVDCollection {
     }
 
     /**
-     * method: removeDVDById
-     * parameters: int id
-     * return: boolean
-     * purpose: Removes a DVD with the given ID from the database
+     * Removes a {@link DVD} record from the database using its unique ID.
+     *
+     * @param id the ID of the DVD to remove
+     * @return {@code true} if the DVD was successfully deleted; {@code false} otherwise
+     * @throws SQLException if a database access error occurs during deletion
      */
     public boolean removeDVDById(int id) {
         String sql = "DELETE FROM dvd WHERE id = ?";
@@ -148,10 +164,12 @@ public class DVDCollection {
     }
 
     /**
-     * method: computeAverageRatingByGenre
-     * parameters: String genre
-     * return: double
-     * purpose: Computes the average rating of all DVDs in a specified genre
+     * Computes the average rating of all {@link DVD} records in a specified genre.
+     * Only DVDs with non-negative ratings are included in the calculation.
+     *
+     * @param genre the genre to filter DVDs by
+     * @return the average rating for the given genre, or 0.0 if none are found
+     * @throws SQLException if a database access error occurs during computation
      */
     public double computeAverageRatingByGenre(String genre) {
         String sql = "SELECT AVG(rating) AS avg_rating FROM dvd WHERE genre = ? AND rating >= 0";
@@ -167,10 +185,12 @@ public class DVDCollection {
     }
 
     /**
-     * method: updateDVD
-     * parameters: int id, DVD updatedDVD
-     * return: boolean
-     * purpose: Updates an existing DVD in the database
+     * Updates an existing {@link DVD} record in the database.
+     *
+     * @param id          the unique ID of the DVD to update
+     * @param updatedDVD  a {@link DVD} object containing the new data to apply
+     * @return {@code true} if the update was successful; {@code false} otherwise
+     * @throws SQLException if a database access error occurs during update
      */
     public boolean updateDVD(int id, DVD updatedDVD) {
         String sql = "UPDATE dvd SET title=?, director=?, release_year=?, genre=?, rating=? WHERE id=?";

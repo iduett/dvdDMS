@@ -8,17 +8,38 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- * Irene Duett, CEN 3024c, 10/25/2025
- * class: CSVImporter
- * purpose: Reads data from a CSV file and loads it into the DVDCollection
+ * Irene Duett, CEN 3024c, 11/12/2025
+ *
+ * The {@code CSVImporter} class provides functionality to import DVD data from
+ * a CSV (Comma-Separated Values) file into the system’s {@link DVDCollection}.
+ *
+ * <p>Each line in the CSV file is expected to represent a single DVD record
+ * with six attributes in the following order:
+ * <b>ID, Title, Director, Release Year, Genre, Rating</b>.</p>
+ *
+ * <p>Invalid or improperly formatted lines are skipped automatically, and an
+ * informational message is displayed in the console for transparency.</p>
+ *
+ * <p><b>Usage Example:</b></p>
+ * <pre>
+ *     DVDCollection collection = new DVDCollection("db/dvds.db");
+ *     int importedCount = CSVImporter.importFromCSV("data/dvds.csv", collection);
+ *     System.out.println(importedCount + " DVDs successfully imported.");
+ * </pre>
  */
 public class CSVImporter {
 
     /**
-     * method: importFromCSV
-     * parameters: String filePath, DVDCollection collection
-     * return: int (number of DVDs successfully added)
-     * purpose: Reads a CSV file and adds valid DVD records to the system
+     * Imports DVD data from a CSV file into the specified {@link DVDCollection}.
+     * <p>
+     * The method reads each line, splits it by commas, validates the data,
+     * constructs a {@link DVD} object, and adds it to the collection.
+     * Lines that are missing fields or contain invalid data are skipped.
+     * </p>
+     *
+     * @param filePath   the full path to the CSV file to be imported
+     * @param collection the {@link DVDCollection} where the DVDs will be stored
+     * @return the number of DVDs successfully added to the collection
      */
     public static int importFromCSV(String filePath, DVDCollection collection) {
         int count = 0;
